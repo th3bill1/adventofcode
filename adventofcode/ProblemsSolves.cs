@@ -95,7 +95,6 @@
             }
             return Convert.ToString(total_score);
         }
-
         public static string Problem2_2(string input)
         {
             int total_score = 0;
