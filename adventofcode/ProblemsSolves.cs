@@ -67,92 +67,6 @@ namespace adventofcode
             }
             return total.ToString();
         }
-        public static string Problem3_1()
-        {
-            string[] rucksacks = problem.Split('\n');
-            int total = 0;
-            foreach(string rucksack in rucksacks)
-            {
-                string compartment1 = rucksack[..(rucksack.Length / 2)];
-                string compartment2 = rucksack[(rucksack.Length / 2)..];
-                foreach (char c in compartment1)
-                {
-                    if(compartment2.Contains(c))
-                    {
-                        if (c > 96) total += c - 96;
-                        else total += c - 38;
-                        break;
-                    }
-                }
-            }
-            return total.ToString();
-        }
-        public static string Problem3_2()
-        {
-            int k = 0, total = 0;
-            string problemx = problem;
-            for(int i = 0; i < problemx.Length; i++)
-            {
-                if (problemx[i] == '\n') k++;
-                if (k == 3)
-                {
-                    problemx = problemx.Insert(i, "\n");
-                    k = 0;
-                    i++;
-                } 
-            }
-            string[] groups = problemx.Split("\n\n");
-            foreach (string group in groups)
-            {
-                string[] Elves = group.Split('\n');
-                foreach (char c in Elves[0])
-                {
-                    if (Elves[1].Contains(c) && Elves[2].Contains(c))
-                    {
-                        if (c > 96) total += c - 96;
-                        else total += c - 38;
-                        break;
-                    }
-                }
-            }
-            return total.ToString();
-        }
-        public static string Problem4_1()
-        {
-            int total = 0;
-            string[] pairs = problem.Split('\n');
-            foreach (string pair in pairs)
-            {
-                if (pair.Length > 3)
-                {
-                    int n = 2;
-                    int[] Elve1 = {Convert.ToInt32(pair.Substring(0,pair.IndexOf('-'))) ,
-                    Convert.ToInt32((pair.Substring(pair.IndexOf('-') + 1, pair.IndexOf(',') - pair.IndexOf('-') - 1))) };
-                    int[] Elve2 = { Convert.ToInt32(pair.Substring(pair.IndexOf(',')+1, pair.IndexOf('-', pair.IndexOf(','))- pair.IndexOf(',')-1)),
-                    Convert.ToInt32(pair.Substring(pair.IndexOf('-', pair.IndexOf(','))+1)) };
-                    if (((Elve1[0] <= Elve2[0]) && (Elve1[1] >= Elve2[1])) || ((Elve1[0] >= Elve2[0]) && (Elve1[1] <= Elve2[1]))) total += 1;
-                }
-            }
-            return total.ToString();
-        }
-        public static string Problem4_2()
-        {
-            int total = 0;
-            string[] pairs = problem.Split('\n');
-            foreach (string pair in pairs)
-            {
-                if (pair.Length > 3)
-                {
-                    int n = 2;
-                    int[] Elve1 = {Convert.ToInt32(pair.Substring(0,pair.IndexOf('-'))) ,
-                    Convert.ToInt32((pair.Substring(pair.IndexOf('-') + 1, pair.IndexOf(',') - pair.IndexOf('-') - 1))) };
-                    int[] Elve2 = { Convert.ToInt32(pair.Substring(pair.IndexOf(',')+1, pair.IndexOf('-', pair.IndexOf(','))- pair.IndexOf(',')-1)),
-                    Convert.ToInt32(pair.Substring(pair.IndexOf('-', pair.IndexOf(','))+1)) };
-                    if (((Elve1[0] <= Elve2[0])&&(Elve1[1] >= Elve2[0]))|| ((Elve2[0] <= Elve1[0]) && (Elve2[1] >= Elve1[0]))) total += 1;
-                }
-            }
-            return total.ToString();
-        }
         public static string Problem2_1(string input)
         {
             int total_score = 0;
@@ -219,6 +133,92 @@ namespace adventofcode
                 }
             }
             return Convert.ToString(total_score);
+        }
+        public static string Problem3_1(string input)
+        {
+            string[] rucksacks = input.Split('\n');
+            int total = 0;
+            foreach (string rucksack in rucksacks)
+            {
+                string compartment1 = rucksack[..(rucksack.Length / 2)];
+                string compartment2 = rucksack[(rucksack.Length / 2)..];
+                foreach (char c in compartment1)
+                {
+                    if (compartment2.Contains(c))
+                    {
+                        if (c > 96) total += c - 96;
+                        else total += c - 38;
+                        break;
+                    }
+                }
+            }
+            return total.ToString();
+        }
+        public static string Problem3_2(string input)
+        {
+            int k = 0, total = 0;
+            string problemx = input;
+            for (int i = 0; i < problemx.Length; i++)
+            {
+                if (problemx[i] == '\n') k++;
+                if (k == 3)
+                {
+                    problemx = problemx.Insert(i, "\n");
+                    k = 0;
+                    i++;
+                }
+            }
+            string[] groups = problemx.Split("\n\n");
+            foreach (string group in groups)
+            {
+                string[] Elves = group.Split('\n');
+                foreach (char c in Elves[0])
+                {
+                    if (Elves[1].Contains(c) && Elves[2].Contains(c))
+                    {
+                        if (c > 96) total += c - 96;
+                        else total += c - 38;
+                        break;
+                    }
+                }
+            }
+            return total.ToString();
+        }
+        public static string Problem4_1(string input)
+        {
+            int total = 0;
+            string[] pairs = input.Split('\n');
+            foreach (string pair in pairs)
+            {
+                if (pair.Length > 3)
+                {
+                    int n = 2;
+                    int[] Elve1 = {Convert.ToInt32(pair.Substring(0,pair.IndexOf('-'))) ,
+                    Convert.ToInt32((pair.Substring(pair.IndexOf('-') + 1, pair.IndexOf(',') - pair.IndexOf('-') - 1))) };
+                    int[] Elve2 = { Convert.ToInt32(pair.Substring(pair.IndexOf(',')+1, pair.IndexOf('-', pair.IndexOf(','))- pair.IndexOf(',')-1)),
+                    Convert.ToInt32(pair.Substring(pair.IndexOf('-', pair.IndexOf(','))+1)) };
+                    if (((Elve1[0] <= Elve2[0]) && (Elve1[1] >= Elve2[1])) || ((Elve1[0] >= Elve2[0]) && (Elve1[1] <= Elve2[1]))) total += 1;
+                }
+            }
+            return total.ToString();
+        }
+        public static string Problem4_2(string input)
+        {
+            int total = 0;
+            string[] pairs = input.Split('\n');
+            foreach (string pair in pairs)
+            {
+                if (pair.Length > 3)
+                {
+                    int n = 2;
+                    int[] Elve1 = {Convert.ToInt32(pair.Substring(0,pair.IndexOf('-'))) ,
+                    Convert.ToInt32((pair.Substring(pair.IndexOf('-') + 1, pair.IndexOf(',') - pair.IndexOf('-') - 1))) };
+                    int[] Elve2 = { Convert.ToInt32(pair.Substring(pair.IndexOf(',')+1, pair.IndexOf('-', pair.IndexOf(','))- pair.IndexOf(',')-1)),
+                    Convert.ToInt32(pair.Substring(pair.IndexOf('-', pair.IndexOf(','))+1)) };
+                    if (((Elve1[0] <= Elve2[0]) && (Elve1[1] >= Elve2[0])) || ((Elve2[0] <= Elve1[0]) && (Elve2[1] >= Elve1[0]))) total += 1;
+                }
+            }
+            return total.ToString();
         }
     }
 }

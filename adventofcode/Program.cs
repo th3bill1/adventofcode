@@ -17,12 +17,15 @@ namespace adventofcode
                 }
                 Console.Write('\n');
             }
-            Console.WriteLine("Please input the problem number:");
-            int problem_number = Convert.ToInt32(Console.ReadLine());
-            Console.WriteLine("Please input the part of problem: ");
-            int part = Convert.ToInt32(Console.ReadLine());
-            
-            Console.WriteLine("Answer: "+GetAnswer.CallMethod(problem_number, part));
+            while (true)
+            {
+                Console.WriteLine("Please input the problem number: (put 0 to leave)");
+                int problem_number = Convert.ToInt32(Console.ReadLine());
+                if (problem_number == 0) break;
+                Console.WriteLine("Please input the part of problem: ");
+                int part = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Answer: " + GetAnswer.CallMethod(problem_number, part));
+            }
         }
     }   
 }
