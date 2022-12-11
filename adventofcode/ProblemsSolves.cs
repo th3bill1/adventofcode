@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -390,5 +392,197 @@ namespace adventofcode
             }
             return message;
         }
+        public static string Problem6_1(string input)
+        {
+            int value = 0;
+            for (int i = 0; i<input.Length-3; i++)
+            {
+                if ((input[i+1] == input[i + 2])) i += 1;
+                else
+                {
+                    if ((input[i + 1] == input[i + 3])) i += 1;
+                    else
+                    {
+                        if ((input[i + 2] == input[i + 3])) i += 2;
+                        else
+                        {
+                            if ((input[i] != input[i + 1]) && (input[i] != input[i + 2]) && (input[i] != input[i + 3]))
+                            {
+                                value = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return (value+4).ToString();
+        }
+        public static string Problem6_2(string input)
+        {
+            int value = 0, cons_char_num = 14;
+            for (int i = 0; i<input.Length-13; i++)
+            {
+                bool temp = true, isActive = true;
+                int j = 0;
+                while (isActive)
+                {
+                    if (j == 14) break;
+                    for (int k = 1; j+k<cons_char_num; k++)
+                    {
+                        if (input[i + j] == input[i+j+k])
+                        {
+                            temp = false;
+                            i += j;
+                            isActive = false;
+                        }
+                    }
+                    j++;
+                }
+                if(temp==true)
+                {
+                    value = i;
+                    break;
+                }
+            }
+            return (value+cons_char_num).ToString();
+        }
+        struct File
+        {
+            public string name;
+            public int size;
+        }
+        struct Directory
+        {
+            public string name;
+            public File[] files;
+            public Directory[] dirs; //dirs[0] = outter dir 
+        }
+        public static string Problem7_1(string input)
+        {
+            string[] commands = input.Split('\n');
+            Directory outter = new()
+            {
+                name = "/",
+                dirs = new Directory[40],
+                files = new File[40]
+            };
+            Directory current_dir = outter;
+            foreach (string command in commands)
+            {
+                if (command.Length > 2)
+                {
+                    if (command.StartsWith('$'))
+                    {
+                        if (command.Substring(2,2)=="cd" && (command.Substring(command.IndexOf("cd") + 3) == ".."))
+                        {
+                            current_dir = current_dir.dirs[0];
+                        }
+                        else if (command.Substring(2, 2) == "cd" && (command.Substring(command.IndexOf("cd") + 3) == "/"))
+                        {
+                            current_dir = outter;
+                        }
+                        else if (command.Substring(2, 2) == "cd")
+                        {
+                            string name = command.Substring(command.IndexOf("cd") + 3);
+                            foreach (Directory dir in current_dir.dirs)
+                            {
+                                if (dir.name == name)
+                                {
+                                    current_dir = dir;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (command.StartsWith("dir"))
+                    {
+                        string name = command.Substring(4);
+                        Directory directory = new()
+                        {
+                            name = name,
+                            dirs = new Directory[40],
+                            files = new File[40]
+                        };
+                        directory.dirs[0] = current_dir;
+                        for (int i = 0; i < 40; i++)
+                        {
+                            if (current_dir.dirs[i].name == null)
+                            {
+                                current_dir.dirs[i] = directory;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        File file = new()
+                        {
+                            name = command.Substring(command.IndexOf(' ')),
+                            size = Convert.ToInt32(command.Substring(0, command.IndexOf(' ')))
+                        };
+                        for (int i = 0; i < 40; i++)
+                        {
+                            if (current_dir.files[i].name == null)
+                            {
+                                current_dir.files[i] = file;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            static int DirectorySize(Directory x)
+            {
+                int size = 0;
+                if(x.name=="/")
+                {
+                    for (int i = 0; i < 40; i++)
+                    {
+                        if (x.dirs[i].name == null) break;
+                        size += DirectorySize(x.dirs[i]);
+                    }
+                }
+                else for (int i = 1; i < 40; i++)
+                {
+                    if (x.dirs[i].name == null) break;
+                    size += DirectorySize(x.dirs[i]);
+                }
+                for (int i = 0; i<40; i++)
+                {
+                    if (x.files[i].name == null) break;
+                    size += x.files[i].size;
+                }
+                return size;
+            }
+
+            static int FindSumOfSmall(Directory outter)
+            {
+                int sum = 0;
+                int temp = DirectorySize(outter);
+                if (temp < 100000) sum += temp;
+                if (outter.name == "/")
+                {
+                    for (int i = 0; i < 40; i++)
+                    {
+                        if (outter.dirs[i].name == null) break;
+                        sum += FindSumOfSmall(outter.dirs[i]);
+                    }
+                }
+                else
+                {
+                    for (int i = 1; i < 40; i++)
+                    {
+                        if (outter.dirs[i].name == null) break;
+                        sum += FindSumOfSmall(outter.dirs[i]);
+                    }
+                }
+                return sum;
+            }
+
+
+            return FindSumOfSmall(outter).ToString();
+        }
+
     }
 }
