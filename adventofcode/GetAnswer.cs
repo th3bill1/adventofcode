@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,8 +21,12 @@ namespace adventofcode
             {
                 string input = GetInput.ProblemText(chosenProblemNumber, GetSession.Session());
                 string? answer = null;
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 answer = Convert.ToString(info.Invoke(null, new object[] {input}));
-                return answer;
+                sw.Stop();
+                TimeSpan ts = sw.Elapsed;
+                return answer + " Solution took:" + ts.TotalSeconds.ToString() + "s";
             }
             return null;
         }

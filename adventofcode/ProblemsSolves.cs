@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -12,54 +13,44 @@ namespace adventofcode
     {
         public static string Problem1_1(string input)
         {
-
-            string[] elves = input.Split("\n\n");
-            string[] calories;
-            int temp = 0, max = 0;
-            foreach (string elve in elves)
+            string[] calories = input.Split("\n");
+            int max = 0, temp = 0;
+            foreach (string calorie in calories)
             {
-                calories = elve.Split("\n");
-                foreach(string calorie in calories)
+                if (calorie == "")
                 {
-                    _ = int.TryParse(calorie, out int number);
-                    temp += number;
-
+                    if (temp > max) max = temp;
+                    temp = 0;
                 }
-                if(temp > max) max = temp;
-                temp = 0;
+                else temp += Convert.ToInt32(calorie);
             }
             return max.ToString();
         }
         public static string Problem1_2(string input)
         {
-
-            string[] elves = input.Split("\n\n");
-            string[] calories;
+            string[] calories = input.Split("\n");
             int temp = 0;
             int[] max = { 0, 0, 0 };
             int total = 0;
-            foreach (string elve in elves)
+            foreach (string calorie in calories)
             {
-                calories = elve.Split("\n");
-                foreach (string calorie in calories)
+                if (calorie == "")
                 {
-                    _ = int.TryParse(calorie, out int number);
-                    temp += number;
-
-                }
-                for (int i = 0; i < 3; i++)
-                {
-                    if (temp > max[i])
+                    for (int i = 0; i < 3; i++)
                     {
-                        for (int j = 2; j > i; j--)
+                        if (temp > max[i])
                         {
-                            max[j] = max[j - 1];
+                            for (int j = 2; j > i; j--)
+                            {
+                                max[j] = max[j - 1];
+                            }
+                            max[i] = temp;
+                            break;
                         }
-                        max[i] = temp;
-                        break;
                     }
+                    temp = 0;
                 }
-                temp = 0;
+                else temp += Convert.ToInt32(calorie);
             }
             for (int i = 0; i < 3; i++)
             {
@@ -156,35 +147,24 @@ namespace adventofcode
         }
         public static string Problem3_2(string input)
         {
-            int k = 0, total = 0;
-            string problemx = input;
-            for (int i = 0; i < problemx.Length; i++)
+            int total = 0;
+            string[] rucksacks = input.Split('\n');
+            for (int i = 0; i<rucksacks.Length; i++)
             {
-                if (problemx[i] == '\n') k++;
-                if (k == 3)
+                foreach (char c in rucksacks[i])
                 {
-                    problemx = problemx.Insert(i, "\n");
-                    k = 0;
-                    i++;
-                }
-            }
-            string[] groups = problemx.Split("\n\n");
-            foreach (string group in groups)
-            {
-                string[] Elves = group.Split('\n');
-                foreach (char c in Elves[0])
-                {
-                    if (Elves[1].Contains(c) && Elves[2].Contains(c))
+                    if (rucksacks[i+1].Contains(c) && rucksacks[i+2].Contains(c))
                     {
                         if (c > 96) total += c - 96;
                         else total += c - 38;
+                        i += 2;
                         break;
                     }
                 }
             }
             return total.ToString();
         }
-        public static string Problem4_1(string input)
+    public static string Problem4_1(string input)
         {
             int total = 0;
             string[] pairs = input.Split('\n');
@@ -219,6 +199,196 @@ namespace adventofcode
                 }
             }
             return total.ToString();
+        }
+
+        public static string Problem5_1(string input)
+        {
+            string[] text = input.Split('\n');
+            string message = "";
+            int crates_number = 0, rows = 0, boxes_number = 0;
+            foreach (string small_text in text)
+            {
+                if (!small_text.Contains('['))
+                {
+                    foreach(char c in small_text)
+                    {
+                        if (Char.IsLetterOrDigit(c)) crates_number++;
+                    }
+                    break;
+                }
+                rows++;
+            }
+            char[,] crates = new char[crates_number,rows*crates_number+1];
+            for (int i = 0; i < crates_number; i++)
+            {
+                for (int j = 0; j<rows*crates_number+1; j++)
+                {
+                    crates[i, j] = ' ';
+                }
+            }
+            int k = 0;
+            foreach (string text1 in text)
+            {
+                for(int i = 0; i<text1.Length; i++)
+                {
+                    if (text1[i] == '[')
+                    {
+                        crates[(i + 1) / 4, k] = text1[i + 1];
+                        boxes_number++;
+                    }
+                }
+                k++;
+            }
+            for (int i = 0; i<crates_number; i++)
+            {
+                for (int j = 0; j<rows/2; j++)
+                {
+                    char temp = crates[i,j];
+                    crates[i, j] = crates[i, rows - j - 1];
+                    crates[i, rows - j - 1] = temp;
+                }
+            }
+            foreach (string command in text)
+            {
+                if(command.StartsWith('m'))
+                {
+                    int howMany = Convert.ToInt32(command.Substring(command.IndexOf(' '), command.IndexOf("from") - command.IndexOf(' ')));
+                    int from = Convert.ToInt32(command.Substring(command.IndexOf("from")+5, command.IndexOf("to") - command.IndexOf("from")-6));
+                    int to = Convert.ToInt32(command.Substring(command.IndexOf("to")+2));
+                    int a = 0;
+                    for(int i = boxes_number; i>=0; i--)
+                    {
+                        if (a == howMany) break;
+                        if (crates[from-1,i]!=' ')
+                        {
+                            for (int j = boxes_number; j>=0; j--)
+                            {
+                                if (crates[to-1,j]!=' ')
+                                {
+                                    crates[to-1, j + 1] = crates[from-1, i];
+                                    crates[from-1, i] = ' ';
+                                    a++;
+                                    break;
+                                }
+                                else if (j==0)
+                                {
+                                    crates[to - 1, j] = crates[from - 1, i];
+                                    crates[from - 1, i] = ' ';
+                                    a++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            for(int i = 0; i<crates_number; i++)
+            {
+                for(int j = boxes_number; j>=0; j--)
+                {
+                    if (crates[i,j]!=' ')
+                    {
+                        message += crates[i, j];
+                        break;
+                    }
+                }
+            }
+            return message;
+        }
+
+        public static string Problem5_2(string input)
+        {
+            string[] text = input.Split('\n');
+            string message = "";
+            int crates_number = 0, rows = 0, boxes_number = 0;
+            foreach (string small_text in text)
+            {
+                if (!small_text.Contains('['))
+                {
+                    foreach (char c in small_text)
+                    {
+                        if (Char.IsLetterOrDigit(c)) crates_number++;
+                    }
+                    break;
+                }
+                rows++;
+            }
+            char[,] crates = new char[crates_number, rows * crates_number + 1];
+            for (int i = 0; i < crates_number; i++)
+            {
+                for (int j = 0; j < rows * crates_number + 1; j++)
+                {
+                    crates[i, j] = ' ';
+                }
+            }
+            int x = 0;
+            foreach (string text1 in text)
+            {
+                for (int i = 0; i < text1.Length; i++)
+                {
+                    if (text1[i] == '[')
+                    {
+                        crates[(i + 1) / 4, x] = text1[i + 1];
+                        boxes_number++;
+                    }
+                }
+                x++;
+            }
+            for (int i = 0; i < crates_number; i++)
+            {
+                for (int j = 0; j < rows / 2; j++)
+                {
+                    char temp = crates[i, j];
+                    crates[i, j] = crates[i, rows - j - 1];
+                    crates[i, rows - j - 1] = temp;
+                }
+            }
+            foreach (string command in text)
+            {
+                if (command.StartsWith('m'))
+                {
+                    int howMany = Convert.ToInt32(command.Substring(command.IndexOf(' '), command.IndexOf("from") - command.IndexOf(' ')));
+                    int from = Convert.ToInt32(command.Substring(command.IndexOf("from") + 5, command.IndexOf("to") - command.IndexOf("from") - 6));
+                    int to = Convert.ToInt32(command.Substring(command.IndexOf("to") + 2));
+                    for (int i = boxes_number; i >= 0; i--)
+                    {
+                        if (crates[from - 1, i] != ' ')
+                        {
+                            for (int j = howMany-1; j>=0; j--)
+                            {
+                                for (int k = boxes_number; k >= 0; k--)
+                                {
+                                    if (crates[to - 1, k] != ' ')
+                                    {
+                                        crates[to - 1, k + 1] = crates[from - 1, i-j];
+                                        crates[from - 1, i-j] = ' ';
+                                        break;
+                                    }
+                                    else if (k == 0)
+                                    {
+                                        crates[to - 1, k] = crates[from - 1, i-j];
+                                        crates[from - 1, i-j] = ' ';
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < crates_number; i++)
+            {
+                for (int j = boxes_number; j >= 0; j--)
+                {
+                    if (crates[i, j] != ' ')
+                    {
+                        message += crates[i, j];
+                        break;
+                    }
+                }
+            }
+            return message;
         }
     }
 }
